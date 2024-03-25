@@ -8,4 +8,4 @@ class Article(models.Model):
     updated = models.TimeField(auto_now=True)
     
     def __str__(self):
-        return self.name
+        return self.title
