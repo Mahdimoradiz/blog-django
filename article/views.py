@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, get_list_or_404, get_object_or_404
 from rest_framework.views import APIView
 from .serializers import ArticleSerializer
 from article.models import Article
@@ -21,7 +21,34 @@ class ArticleCreateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ArticleUpdateView(APIView):
+    def put(self, request, pk):
+        article = get_object_or_404(Article, id=pk)
+        serializer = ArticleSerializer(article, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    def patch(self, request, pk):
+        article = get_object_or_404(Article, id=pk)
+        serializer = ArticleSerializer(article, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class ArticleDeleteView(APIView):
+    def delete(self, request, pk):
+        article = get_object_or_404(Article, id=pk)
+        article.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ArticlePagination(pagination.PageNumberPagination):
     page_size = 10
